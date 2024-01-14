@@ -7,29 +7,27 @@ using Pixel.Util;
 using DotNetEnv;
 using Discord;
 
-namespace Pixel.Services
+namespace Pixel.Services;
+
+public class BotService : IHostedService
 {
-    public class BotService : IHostedService
+    private readonly DiscordSocketClient _discord;
+
+    public BotService(DiscordSocketClient discord, ILogger<DiscordSocketClient> logger)
     {
-        private readonly DiscordSocketClient _discord;
+        _discord = discord;
+        _discord.Log += msg => Logger.OnLogAsync(logger, msg);
+    }
 
-        public BotService(DiscordSocketClient discord, ILogger<DiscordSocketClient> logger)
-        {
-            _discord = discord;
+    public async Task StartAsync(CancellationToken cancellationToken)
+    {
+        await _discord.LoginAsync(TokenType.Bot, Env.GetString("DISCORD_TOKEN"));
+        await _discord.StartAsync();
+    }
 
-            _discord.Log += msg => Logger.OnLogAsync(logger, msg);
-        }
-
-        public async Task StartAsync(CancellationToken cancellationToken)
-        {
-            await _discord.LoginAsync(TokenType.Bot, Env.GetString("DISCORD_TOKEN"));
-            await _discord.StartAsync();
-        }
-
-        public async Task StopAsync(CancellationToken cancellationToken)
-        {
-            await _discord.LogoutAsync();
-            await _discord.StopAsync();
-        }
+    public async Task StopAsync(CancellationToken cancellationToken)
+    {
+        await _discord.LogoutAsync();
+        await _discord.StopAsync();
     }
 }

@@ -6,25 +6,25 @@ using Discord.WebSocket;
 using Pixel.Services;
 using DotNetEnv;
 
+namespace Pixel;
 
-namespace Pixel
+internal abstract class Program
 {
-    internal abstract class Program
+    public static async Task Main(string[] args)
     {
-        public static async Task Main(string[] args)
-        {
-            Env.TraversePath().Load();
+        Env.TraversePath().Load();
 
-            using var host = Host.CreateDefaultBuilder(args)
-                .ConfigureServices(services =>
-                {
-                    services.AddSingleton<DiscordSocketClient>();
-                    services.AddSingleton<InteractionService>();
-                    services.AddHostedService<BotService>();
-                })
-                .Build();
+        using var host = Host.CreateDefaultBuilder(args)
+            .ConfigureServices(services =>
+            {
+                services.AddSingleton<DiscordSocketClient>();
+                services.AddSingleton<InteractionService>();
+                    
+                services.AddHostedService<InteractionHandlingService>();
+                services.AddHostedService<BotService>();
+            })
+            .Build();
 
-            await host.RunAsync();
-        }
+        await host.RunAsync();
     }
 }
