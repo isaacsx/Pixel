@@ -8,5 +8,8 @@ public class UserCommand : InteractionModuleBase<SocketInteractionContext>
 {
     [SlashCommand("ping", "The latency of the bot")]
     [RequireBotPermission(GuildPermission.SendMessages)]
-    public Task Run() => ReplyAsync($"{Context.Client.Latency}ms");
+    public Task Run() => {
+        await DeferAsync();
+    await FollowupAsync("ping", $"{Context.Client.Latency}ms");
+};
 }
